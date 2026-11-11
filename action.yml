@@ -1,0 +1,109 @@
+name: sloplint
+description: Review the lines a pull request adds for hallucinated packages, placeholder code, hollow tests and other checkable AI slop.
+author: Talha-2
+branding:
+  icon: check-circle
+  color: green
+
+inputs:
+  base:
+    description: Ref to compare against. Defaults to the pull request's base branch.
+    required: false
+    default: ''
+  fail-on:
+    description: Fail the check at this severity or worse (error | warn | info | none).
+    required: false
+    default: error
+  comment:
+    description: Post (and keep updating) one summary comment on the pull request.
+    required: false
+    default: 'true'
+  online:
+    description: Look up flagged imports on npm / PyPI to tell hallucinated packages from undeclared ones.
+    required: false
+    default: 'true'
+  working-directory:
+    description: Folder to run in (for monorepos).
+    required: false
+    default: '.'
+  github-token:
+    description: Token used to post the comment.
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  grade:
+    description: Letter grade A-F.
+    value: ${{ steps.run.outputs.grade }}
+  errors:
+    description: Number of error findings.
+    value: ${{ steps.run.outputs.errors }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - id: run
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BASE: ${{ inputs.base || (github.base_ref && format('origin/{0}', github.base_ref)) || '' }}
+        ONLINE: ${{ inputs.online }}
+        WD: ${{ inputs.working-directory }}
+        SLOPLINT_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: |
+        set -eo pipefail
+        cli="$GITHUB_ACTION_PATH/bin/sloplint.js"
+        args=(--format json --output "$RUNNER_TEMP/sloplint.json" --fail-on none)
+        if [ -n "$BASE" ]; then
+          git fetch --no-tags --quiet origin "${BASE#origin/}" || true
+          args+=(--base "$BASE")
+        fi
+        if [ "$ONLINE" = "true" ]; then args+=(--online); fi
+        node "$cli" "${args[@]}"
+        node "$cli" --from-json "$RUNNER_TEMP/sloplint.json" --format markdown --output "$RUNNER_TEMP/sloplint.md"
+        cat "$RUNNER_TEMP/sloplint.md" >> "$GITHUB_STEP_SUMMARY"
+        # Step outputs + inline annotations on the PR's Files tab.
+        node -e '
+          const r = require(process.argv[1]);
+          const prefix = process.env.WD && process.env.WD !== "." ? process.env.WD.replace(/\/$/, "") + "/" : "";
+          require("fs").appendFileSync(process.env.GITHUB_OUTPUT, `grade=${r.grade}\nerrors=${r.counts.error}\n`);
+          for (const f of r.findings) {
+            const level = f.severity === "error" ? "error" : f.severity === "warn" ? "warning" : "notice";
+            const msg = String(f.message).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
+            console.log(`::${level} file=${prefix}${f.file},line=${f.line},title=sloplint ${f.rule}::${msg}`);
+          }
+        ' "$RUNNER_TEMP/sloplint.json"
+
+    - if: inputs.comment == 'true' && github.event.pull_request
+      uses: actions/github-script@v7
+      continue-on-error: true # read-only tokens on fork PRs can't comment; the job summary still has the report
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const fs = require('fs');
+          const body = fs.readFileSync(`${process.env.RUNNER_TEMP}/sloplint.md`, 'utf8');
+          const marker = '<!-- sloplint-report -->';
+          const { owner, repo } = context.repo;
+          const issue_number = context.payload.pull_request.number;
+          const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });
+          const mine = comments.find((c) => c.body && c.body.includes(marker));
+          const clean = body.includes('No slop found');
+          if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+          else if (!clean) await github.rest.issues.createComment({ owner, repo, issue_number, body });
+
+    - shell: bash
+      env:
+        FAIL_ON: ${{ inputs.fail-on }}
+      run: |
+        node -e '
+          const r = require(process.argv[1]);
+          const rank = { error: 3, warn: 2, info: 1 };
+          const min = { error: 3, warn: 2, info: 1, none: 99 }[process.env.FAIL_ON] ?? 3;
+          const bad = r.findings.filter((f) => rank[f.severity] >= min).length;
+          console.log(`sloplint grade ${r.grade}: ${r.counts.error} errors, ${r.counts.warn} warnings, ${r.counts.info} info`);
+          process.exit(bad ? 1 : 0);
+        ' "$RUNNER_TEMP/sloplint.json"

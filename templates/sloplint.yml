@@ -1,0 +1,22 @@
+name: sloplint
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write # to post the summary comment
+
+jobs:
+  sloplint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # sloplint diffs against the base branch
+
+      - uses: Talha-2/sloplint@v0
+        # with:
+        #   fail-on: error     # error | warn | info | none
+        #   comment: true      # one summary comment, updated on each push
+        #   online: true       # check flagged imports exist on npm / PyPI

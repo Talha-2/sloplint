@@ -1,0 +1,46 @@
+{
+  "name": "sloplint",
+  "version": "0.1.0",
+  "description": "Catch the checkable problems AI-written code ships with: hallucinated packages, placeholder code, tests that can't fail, swallowed errors. CLI, GitHub Action and agent skill.",
+  "type": "module",
+  "bin": {
+    "sloplint": "bin/sloplint.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./report": "./src/report.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "skills",
+    "templates",
+    "docs"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "lint:self": "node bin/sloplint.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "ai",
+    "slop",
+    "linter",
+    "code-review",
+    "hallucination",
+    "slopsquatting",
+    "claude-code",
+    "codex",
+    "agents-md",
+    "github-action"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Talha-2/sloplint.git"
+  },
+  "homepage": "https://github.com/Talha-2/sloplint#readme",
+  "bugs": "https://github.com/Talha-2/sloplint/issues",
+  "license": "MIT"
+}

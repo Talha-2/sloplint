@@ -1,0 +1,11 @@
+{
+  "name": "sloplint",
+  "owner": { "name": "Talha-2" },
+  "plugins": [
+    {
+      "name": "sloplint",
+      "source": "./",
+      "description": "Rules that keep Claude from shipping AI slop, plus a linter that checks for it."
+    }
+  ]
+}
