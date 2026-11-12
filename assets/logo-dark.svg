@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="112" viewBox="0 0 440 112" role="img" aria-label="sloplint">
+  <title>sloplint</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="9">
+    <path d="M10 56 C 16 26, 28 26, 34 56 C 40 80, 50 80, 56 56 C 60 42, 66 42, 70 56" stroke="#6b7280"/>
+    <path d="M70 56 H 112" stroke="#4ade80"/>
+  </g>
+  <text x="136" y="74" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="50" letter-spacing="-1" textLength="290" lengthAdjust="spacingAndGlyphs"><tspan fill="#6b7280" font-weight="500">slop</tspan><tspan fill="#f3f4f6" font-weight="700">lint</tspan></text>
+</svg>
