@@ -22,7 +22,7 @@
     "lint:self": "node bin/sloplint.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "keywords": [
     "ai",

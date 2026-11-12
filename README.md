@@ -27,7 +27,7 @@ sloplint grade F  3 errors, 2 warnings, 0 info  (2 files, 22 lines, whole projec
 
 ## Quick start
 
-Needs Node 20+. No install, no config, no dependencies.
+Needs Node 22+. No install, no config, no dependencies.
 
 ### 1. Check your code
 
@@ -80,7 +80,7 @@ jobs:
   sloplint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: Talha-2/sloplint@v0
