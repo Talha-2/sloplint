@@ -31,6 +31,8 @@ src/
   data/                  Python standard library list, pip name mappings
 skills/sloplint/         agent skill for writing work
 skills/sloplint-review/  agent skill for reviewing a change
+skills/sloplint-tests/   agent skill for writing tests that can fail
+skills/sloplint-deps/    agent skill for adding packages safely
 templates/               files `sloplint init` writes into other repos
 action.yml               the GitHub Action
 examples/demo/           a sloppy project used for the README output
@@ -54,7 +56,9 @@ A rule should flag only things a reviewer can verify. If a rule can't tell for s
 
 ## Changing the agent skill
 
-The writing skill (`skills/sloplint/SKILL.md`), the review skill (`skills/sloplint-review/SKILL.md`) and the AGENTS.md section (`templates/agents-md-section.md`) use the same nine rules. Keep them in sync. Write in plain language: short sentences, one idea each, and a reason for every rule.
+The writing skill (`skills/sloplint/SKILL.md`), the review skill (`skills/sloplint-review/SKILL.md`) and the AGENTS.md section (`templates/agents-md-section.md`) use the same nine rules. Keep them in sync. The tests and deps skills expand rules 6 and 1 into full processes, so keep them consistent with those rules too.
+
+New skills go in `skills/<name>/SKILL.md` and must be added to the `SKILLS` list in `src/init.js`. Write in plain language: short sentences, one idea each, and a reason for every rule.
 
 ## Pull requests
 

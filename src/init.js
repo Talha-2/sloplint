@@ -17,6 +17,8 @@ const END = '<!-- sloplint:end -->';
 const SKILLS = [
   ['sloplint', 'Writing skill'],
   ['sloplint-review', 'Review skill'],
+  ['sloplint-tests', 'Testing skill'],
+  ['sloplint-deps', 'Dependency skill'],
 ];
 
 export function runInit({ cwd, global = false, ci = false, claude = true, agentsMd = true, force = false, log = console.log }) {

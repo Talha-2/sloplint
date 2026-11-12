@@ -31,6 +31,8 @@ The exit code is `1` when findings reach `--fail-on`, and `2` on a usage error. 
 |---|---|
 | `.claude/skills/sloplint/SKILL.md` | Claude Code, when it writes or changes code |
 | `.claude/skills/sloplint-review/SKILL.md` | Claude Code, when you ask it to review a diff or pull request |
+| `.claude/skills/sloplint-tests/SKILL.md` | Claude Code, when it writes or fixes tests |
+| `.claude/skills/sloplint-deps/SKILL.md` | Claude Code, before it adds or upgrades a package |
 | a marked section in `AGENTS.md` (the rest of the file is untouched) | Codex, Cursor, GitHub Copilot, Gemini CLI, Jules, Amp |
 
 Running it again updates the section in place. Claude Code users can also install the skill as a plugin:

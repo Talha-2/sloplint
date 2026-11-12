@@ -100,7 +100,9 @@ test('init installs the skill and an idempotent AGENTS.md section', () => {
   assert.ok(agents.startsWith('# Project rules\n\nUse pnpm.'));
   assert.equal(agents.split('<!-- sloplint:start -->').length, 2);
   assert.match(fs.readFileSync(path.join(cwd, '.claude/skills/sloplint/SKILL.md'), 'utf8'), /^---\nname: sloplint\n/);
-  assert.match(fs.readFileSync(path.join(cwd, '.claude/skills/sloplint-review/SKILL.md'), 'utf8'), /^---\nname: sloplint-review\n/);
+  for (const name of ['sloplint-review', 'sloplint-tests', 'sloplint-deps']) {
+    assert.match(fs.readFileSync(path.join(cwd, `.claude/skills/${name}/SKILL.md`), 'utf8'), new RegExp(`^---\\nname: ${name}\\n`));
+  }
   assert.match(fs.readFileSync(path.join(cwd, '.github/workflows/sloplint.yml'), 'utf8'), /fetch-depth: 0/);
 });
 

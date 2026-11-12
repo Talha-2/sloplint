@@ -46,7 +46,7 @@ npx sloplint          # whole project
 npx sloplint --diff   # only what you changed
 ```
 
-**Teach your coding agent.** Adds the rules for Claude Code, Codex, Cursor, Copilot and other agents, so they check their own work. Claude Code also gets a review skill: ask it to "review this PR for slop".
+**Teach your coding agent.** Adds the rules for Claude Code, Codex, Cursor, Copilot and other agents, so they check their own work.
 
 ```bash
 npx sloplint init
@@ -73,11 +73,23 @@ npx sloplint init --ci
 
 Works on JavaScript, TypeScript and Python. The comment and prose rules also cover Go, Rust, Java, C#, Ruby, PHP, Swift, Kotlin and Markdown.
 
+## Agent skills
+
+`npx sloplint init` installs these for Claude Code. Each one is a short, plain-language process the agent follows.
+
+| Skill | Used when the agent… |
+|---|---|
+| [`sloplint`](skills/sloplint/SKILL.md) | writes or changes code, docs or commits |
+| [`sloplint-review`](skills/sloplint-review/SKILL.md) | reviews a diff or pull request |
+| [`sloplint-tests`](skills/sloplint-tests/SKILL.md) | writes tests, and proves each one fails when the code is broken |
+| [`sloplint-deps`](skills/sloplint-deps/SKILL.md) | adds a package, after checking it's real, maintained and licensed |
+
+Other agents (Codex, Cursor, Copilot, Gemini CLI) get the core rules through `AGENTS.md`.
+
 ## Docs
 
 - [Usage](docs/usage.md): CLI options, GitHub Action, configuration, pre-commit hook
 - [Rules](docs/rules.md): what each rule flags and how to fix it
-- Agent skills: [sloplint](skills/sloplint/SKILL.md) for writing work, and [sloplint-review](skills/sloplint-review/SKILL.md) for reviewing a diff or pull request
 
 ## Contributing
 
