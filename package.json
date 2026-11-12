@@ -18,7 +18,7 @@
     "docs"
   ],
   "scripts": {
-    "test": "node --test",
+    "test": "node --test \"test/**/*.test.js\"",
     "lint:self": "node bin/sloplint.js"
   },
   "engines": {

@@ -35,6 +35,8 @@ tests/server.test.js
 sloplint grade F  3 errors, 1 warning, 0 info  (2 files, 18 lines, whole project)
 ```
 
+This output comes from [`examples/demo`](examples/demo). Run it there to see it yourself.
+
 ## Get started
 
 **Check your code.** No install, no config.
@@ -75,10 +77,11 @@ Works on JavaScript, TypeScript and Python. The comment and prose rules also cov
 
 - [Usage](docs/usage.md): CLI options, GitHub Action, configuration, pre-commit hook
 - [Rules](docs/rules.md): what each rule flags and how to fix it
+- [Agent skill](skills/sloplint/SKILL.md): the rules your coding agent follows
 
 ## Contributing
 
-Each rule is one file in [`src/rules/`](src/rules) with tests in [`test/`](test). Run `npm test`; there's nothing to install. False-positive reports are especially welcome.
+Each rule is one file with its own tests, and there's nothing to install. See [CONTRIBUTING.md](CONTRIBUTING.md). False-positive reports are especially welcome.
 
 ## License
 

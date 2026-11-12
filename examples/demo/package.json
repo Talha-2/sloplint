@@ -1,0 +1,11 @@
+{
+  "name": "sloplint-demo",
+  "private": true,
+  "description": "A small project with deliberate slop. Run `npx sloplint --online` in this folder to see what sloplint reports.",
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0"
+  }
+}

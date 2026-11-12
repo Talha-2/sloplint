@@ -26,7 +26,7 @@ export function runInit({ cwd, global = false, ci = false, claude = true, agents
 
   if (agentsMd) {
     const file = global ? path.join(home, '.codex', 'AGENTS.md') : path.join(cwd, 'AGENTS.md');
-    const section = `${START}\n${read('templates/agents-section.md').trim()}\n${END}`;
+    const section = `${START}\n${read('templates/agents-md-section.md').trim()}\n${END}`;
     upsertSection(file, section);
     done.push(['AGENTS.md rules', file]);
   }
@@ -39,7 +39,7 @@ export function runInit({ cwd, global = false, ci = false, claude = true, agents
       if (fs.existsSync(file) && !force) {
         log(`Kept existing ${rel(cwd, file)} (use --force to overwrite).`);
       } else {
-        write(file, read('templates/sloplint.yml'), { force: true });
+        write(file, read('templates/github-workflow.yml'), { force: true });
         done.push(['GitHub Action', file]);
       }
     }

@@ -1,0 +1,26 @@
+name: Bug
+description: sloplint crashed or did something unexpected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command you ran
+      placeholder: npx sloplint --diff
+  - type: input
+    id: versions
+    attributes:
+      label: sloplint version, Node version, OS
+      placeholder: sloplint 0.1.0, Node 24, macOS

@@ -1,70 +1,104 @@
 ---
 name: sloplint
-description: Rules for writing code, tests, comments, docs, commit messages and PR descriptions that a careful senior engineer would sign off on, without the usual AI-slop failure modes (hallucinated packages, placeholder code, tests that can't fail, swallowed errors, narrating comments, filler prose). Use whenever you write or review code, tests, READMEs, commits or PRs, and before you say a task is done.
+description: Use when you write, change or review code, tests, comments, docs, commit messages or pull requests, and before you say a coding task is done. It lists the mistakes AI-written work often has, such as importing packages that don't exist, leaving placeholder code, writing tests that can't fail and hiding errors, and how to avoid each one.
 ---
 
-# sloplint: ship work you could defend line by line
+# sloplint
 
-Slop is output that looks finished but isn't: it compiles, it reads confidently, and it falls apart on first contact with a reviewer. Every rule below targets something a reviewer can **check**, not a style preference.
+"Slop" is work that looks finished but isn't. It reads well, but it falls apart when someone checks it.
 
-## Before you say "done"
+This skill lists the mistakes that cause slop. Each rule says what to do, why it matters, and how to check it. Every rule is about something a reviewer can verify, not about style.
 
-1. If the project has Node available, run `npx sloplint --diff` and fix every **error**. Fix warnings unless you can say why they're wrong. If a finding is a false positive, add `// sloplint-ignore-line` (or `# sloplint-ignore-line`) with a short reason.
-2. Run the project's real tests, linter and type checker. Report what you ran and what it printed. Never write "all tests pass" unless you ran them in this session and saw them pass.
-3. Re-read your diff as a reviewer. Delete anything you can't justify.
+Follow the rules while you work. Then go through the checklist at the end before you say you are done.
 
 ## Code
 
-**Only import what exists.** Before adding an import, confirm the package is in `package.json` / `requirements.txt` / `pyproject.toml`, or add it there in the same change. Never guess a package name from what it "should" be called: look it up (`npm view <name>`, `pip index versions <name>`). A hallucinated package name is a security hole: attackers register those names ("slopsquatting").
+### 1. Only import packages that are real and declared
 
-**Only call what exists.** Before calling a function, method, API endpoint, CLI flag or config key, find its definition in the codebase or its docs. If you can't find it, say so; don't invent a plausible signature.
+- **Do:** Before you import a package, find it in the project's dependency file (`package.json`, `requirements.txt` or `pyproject.toml`). If it isn't there, add it in the same change.
+- **Why:** AI models often invent package names that sound right. A made-up package breaks the build. Worse, attackers publish packages under commonly invented names, so installing one can run their code.
+- **Check:** If you aren't sure a package exists, look it up (`npm view <name>` or `pip index versions <name>`). Don't guess.
 
-**Write the whole thing.** Never leave `// ... rest of code`, `// existing code here`, `# implementation goes here`, `pass  # TODO`, or "simplified for brevity" stubs. If something is genuinely out of scope, say so in your reply and leave a TODO that names the missing behaviour and why it's missing.
+### 2. Only use functions and options that exist
 
-**Don't swallow errors.** No empty `catch {}`, no `except: pass`, no `.catch(() => {})`. Either handle the error (retry, fall back, return a typed error), add context and rethrow, or let it propagate. If ignoring it is correct, write one comment saying why.
+- **Do:** Before you call a function, method, API endpoint, command-line flag or setting, find where it is defined, in this codebase or in its official docs.
+- **Why:** A call that looks right but doesn't exist fails at runtime, often far from where it was written.
+- **Check:** If you can't find the definition, don't write the call. Tell the user what you couldn't find.
 
-**Don't add speculative machinery.** No abstraction with one implementation, no config option nobody asked for, no "manager"/"helper"/"utils" class wrapping two functions, no defensive checks for states the types already rule out. Match the patterns already in the codebase rather than introducing new ones.
+### 3. Finish the code you write
 
-**Keep the diff to the task.** No drive-by renames, reformatting or "improvements" to unrelated code. Unrelated changes hide the real change and make review slower.
+- **Do:** Write every part of the change. Don't leave stand-ins like `// ... rest of code`, `// existing code here` or `# implementation goes here`.
+- **Why:** A placeholder looks like working code until it runs.
+- **Check:** If part of the task truly can't be done now, say so in your reply. In the code, leave a TODO that says what is missing and why.
 
-## Comments
+### 4. Don't hide errors
 
-Comments explain **why**, never **what**. The code already says what.
+- **Do:** When you catch an error, handle it, re-throw it with more detail, or let it reach the caller.
+- **Why:** An empty `catch {}` or `except: pass` makes failures silent, so bugs show up later in a place that is much harder to debug.
+- **Check:** If ignoring an error really is correct, add a short comment inside the block that says why.
 
-```python
-# Bad: restates the code
-# Increment the retry counter
-retries += 1
+### 5. Change only what the task needs
 
-# Good: explains a decision a reader would question
-# The upstream API rate-limits per minute, so back off a full minute, not exponentially.
-time.sleep(60)
-```
-
-- Don't write a docstring that repeats the function name ("`get_user`: Gets the user.").
-- Don't leave notes addressed to the user ("Here's the updated function", "Note: you may need to…"). That belongs in your reply, not the file.
-- Don't mark changes in comments (`// CHANGED:`, `// NEW:`, `// Fixed bug here`). Version control already records that.
+- **Do:** Keep the change focused. Follow the patterns this codebase already uses.
+- **Why:** Unrelated edits hide the real change and make review slower. Extra layers that aren't needed yet, like an interface with one implementation or a setting no one asked for, make the code harder to change.
+- **Check:** Read your diff. Every changed line should be explained by the task.
 
 ## Tests
 
-A test that cannot fail is worse than no test, because it's false evidence.
+### 6. Write tests that can fail
 
-- Every test must assert on behaviour that would break if the code were wrong. Before you finish, ask: "if I deleted the implementation, would this test fail?"
-- Never `expect(true).toBe(true)`, `assert True`, or assert a value against itself.
-- Don't mock the unit under test. Mock its boundaries (network, clock, filesystem), then assert on its output.
-- Don't weaken or delete a failing test to make it pass. A failing test means the code or the test is wrong; find out which and say so.
-- Cover the edge cases the change introduces (empty input, error path, boundary values), not only the happy path.
+- **Do:** Assert on what the code under test returns or does.
+- **Why:** A test that always passes tells you nothing, and it makes broken code look checked.
+- **Check:** Ask, "If this code were broken, would this test fail?" If not, fix the test. Never assert something that is always true, like `expect(true).toBe(true)` or `assert True`. Don't mock the code you are testing; mock only what it depends on, such as the network, the clock or the file system.
 
-## Docs, READMEs, commits, PRs
+### 7. Don't weaken a failing test to make it pass
 
-Write like an engineer briefing a colleague: specific, short, verifiable.
+- **Do:** When a test fails, find out whether the code or the test is wrong.
+- **Why:** Changing the test to match broken code hides the bug.
+- **Check:** Fix the real cause and say what it was. If the test itself was wrong, explain why.
 
-- **No filler.** Cut `delve into`, `unlock the power of`, `seamlessly integrates`, `in today's fast-paced world`, `it's important to note`, `robust and scalable solution`, `a testament to`. Replace each with the concrete fact, or delete it.
-- **No template decoration.** Don't put an emoji at the start of every heading (`## 🚀 Features`, `## 📦 Installation`), and don't add a "Features" list that restates the description. Don't add badges for things that aren't set up.
-- **Claims need evidence.** "Faster" needs a number and how you measured it. "Tested" needs the command you ran. "Production-ready" needs nothing; don't write it.
-- **Commit messages:** imperative subject under ~70 characters saying what changed. Then a body saying why, if it isn't obvious. No bullet list restating the diff file by file.
-- **PR descriptions:** what changed, why, how you verified it, and anything the reviewer should look at closely. Mention anything you were unsure about or didn't test.
+## Comments
 
-## When you don't know
+### 8. Explain why, not what
 
-Say so. "I couldn't find where X is configured; I assumed Y" is useful. A confident guess dressed up as fact is the most expensive kind of slop, because someone has to find out it's wrong.
+- **Do:** Write a comment when the reason for the code isn't obvious: a decision, a limit, a workaround.
+- **Why:** The code already shows what it does. A comment that repeats it adds reading time and goes stale.
+- **Check:** Delete comments that only restate the next line.
+
+```python
+# Restates the code. Delete it.
+# Increment the retry counter
+retries += 1
+
+# Explains a decision. Keep it.
+# The API limits requests per minute, so wait a full minute before retrying.
+time.sleep(60)
+```
+
+Also keep chat out of files. Notes for the user ("Here's the updated function") go in your reply, not in the code. Don't mark edits with comments like `// NEW` or `// changed`, because version control already records changes.
+
+## Writing: docs, READMEs, commit messages, pull requests
+
+### 9. Write plainly and back up claims
+
+- **Do:** Use short, specific sentences. Say the concrete fact.
+- **Why:** Filler makes text longer without making it clearer, and readers learn to skim past it.
+- **Check:**
+  - Remove stock phrases such as `delve into`, `seamlessly`, `unlock the power of` and `it's important to note`. Replace each with the fact it was hiding, or delete the sentence.
+  - Don't start every heading with an emoji.
+  - Support every claim. "Faster" needs a number. "Tested" needs the command you ran.
+
+For a **commit message**, write a short first line that says what changed. Add a body that says why, if the reason isn't obvious.
+
+For a **pull request**, say what changed, why, how you checked it, and anything you are unsure about.
+
+## Before you say "done"
+
+- [ ] Run the project's tests, linter and type checker. Report what you ran and what it printed.
+- [ ] If the project can run it, run `npx sloplint --diff` and fix every error. If a finding is wrong, add `sloplint-ignore-line` to that line with a short reason.
+- [ ] Read your whole diff the way a reviewer would. Remove anything you can't explain.
+- [ ] Say "tests pass" only if you ran them in this session and saw them pass.
+
+## When you aren't sure
+
+Say so. "I couldn't find where X is configured, so I assumed Y" helps the user. A confident guess costs more, because someone has to discover that it's wrong.
