@@ -64,7 +64,8 @@ runs:
         fi
         if [ "$ONLINE" = "true" ]; then args+=(--online); fi
         node "$cli" "${args[@]}"
-        node "$cli" --from-json "$RUNNER_TEMP/sloplint.json" --format markdown --output "$RUNNER_TEMP/sloplint.md"
+        # Only render here; the last step decides pass/fail.
+        node "$cli" --from-json "$RUNNER_TEMP/sloplint.json" --format markdown --output "$RUNNER_TEMP/sloplint.md" --fail-on none
         cat "$RUNNER_TEMP/sloplint.md" >> "$GITHUB_STEP_SUMMARY"
         # Step outputs + inline annotations on the PR's Files tab.
         node -e '

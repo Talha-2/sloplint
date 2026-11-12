@@ -122,7 +122,10 @@ test('CLI exit codes and formats', () => {
 
   const out = path.join(cwd, 'r.json');
   run('--format', 'json', '--output', out);
-  const md = run('--from-json', out, '--format', 'markdown');
+  // The GitHub Action renders the comment this way; it must not fail the step when there are errors.
+  const md = run('--from-json', out, '--format', 'markdown', '--fail-on', 'none');
+  assert.equal(md.status, 0);
+  assert.equal(run('--from-json', out, '--format', 'markdown').status, 1);
   assert.match(md.stdout, /sloplint-report/);
 
   assert.equal(run('--fail-on', 'bogus').status, 2);

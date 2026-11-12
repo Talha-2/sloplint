@@ -18,6 +18,30 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm test
 
+  # Run the real action on the demo project, which has known errors, and
+  # check it reports them instead of crashing.
+  action:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - id: demo
+        uses: ./
+        with:
+          working-directory: examples/demo
+          base: ''
+          fail-on: none
+          comment: 'false'
+          online: 'true'
+      - name: Check the action's outputs
+        env:
+          GRADE: ${{ steps.demo.outputs.grade }}
+          ERRORS: ${{ steps.demo.outputs.errors }}
+        run: |
+          echo "grade=$GRADE errors=$ERRORS"
+          test "$GRADE" = "F"
+          test "$ERRORS" -ge 3
+
   # Dogfood: run this repo's own action on its pull requests.
   sloplint:
     if: github.event_name == 'pull_request'

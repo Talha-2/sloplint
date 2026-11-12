@@ -1,6 +1,6 @@
 {
   "name": "sloplint",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rules that keep Claude from shipping AI slop: hallucinated packages, placeholder code, tests that can't fail, swallowed errors, narrating comments and filler prose.",
   "author": { "name": "Talha-2" },
   "homepage": "https://github.com/Talha-2/sloplint",
