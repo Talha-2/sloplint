@@ -16,7 +16,7 @@ sloplint [paths...]       check the project, or only these paths
 sloplint init             install the agent rules
   --global                for every project (~/.claude/skills, ~/.codex/AGENTS.md)
   --ci                    also add .github/workflows/sloplint.yml
-  --no-claude             skip the Claude Code skill
+  --no-claude             skip the Claude Code skills
   --no-agents-md          skip the AGENTS.md section
 sloplint rules            list the rules
 ```
@@ -29,7 +29,8 @@ The exit code is `1` when findings reach `--fail-on`, and `2` on a usage error. 
 
 | File | Read by |
 |---|---|
-| `.claude/skills/sloplint/SKILL.md` | Claude Code |
+| `.claude/skills/sloplint/SKILL.md` | Claude Code, when it writes or changes code |
+| `.claude/skills/sloplint-review/SKILL.md` | Claude Code, when you ask it to review a diff or pull request |
 | a marked section in `AGENTS.md` (the rest of the file is untouched) | Codex, Cursor, GitHub Copilot, Gemini CLI, Jules, Amp |
 
 Running it again updates the section in place. Claude Code users can also install the skill as a plugin:

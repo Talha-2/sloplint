@@ -46,7 +46,7 @@ npx sloplint          # whole project
 npx sloplint --diff   # only what you changed
 ```
 
-**Teach your coding agent.** Adds the rules for Claude Code, Codex, Cursor, Copilot and other agents, so they check their own work.
+**Teach your coding agent.** Adds the rules for Claude Code, Codex, Cursor, Copilot and other agents, so they check their own work. Claude Code also gets a review skill: ask it to "review this PR for slop".
 
 ```bash
 npx sloplint init
@@ -77,7 +77,7 @@ Works on JavaScript, TypeScript and Python. The comment and prose rules also cov
 
 - [Usage](docs/usage.md): CLI options, GitHub Action, configuration, pre-commit hook
 - [Rules](docs/rules.md): what each rule flags and how to fix it
-- [Agent skill](skills/sloplint/SKILL.md): the rules your coding agent follows
+- Agent skills: [sloplint](skills/sloplint/SKILL.md) for writing work, and [sloplint-review](skills/sloplint-review/SKILL.md) for reviewing a diff or pull request
 
 ## Contributing
 

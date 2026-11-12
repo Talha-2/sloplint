@@ -10,18 +10,26 @@ const END = '<!-- sloplint:end -->';
 
 /**
  * Install sloplint's rules where coding agents will read them.
- *  - Claude Code: .claude/skills/sloplint/SKILL.md (loaded on demand)
+ *  - Claude Code: .claude/skills/<name>/SKILL.md for each skill (loaded on demand)
  *  - AGENTS.md:   a short always-on section (Codex, Cursor, Copilot, Gemini CLI, Jules, Amp...)
  *  - --ci:        .github/workflows/sloplint.yml
  */
+const SKILLS = [
+  ['sloplint', 'Writing skill'],
+  ['sloplint-review', 'Review skill'],
+];
+
 export function runInit({ cwd, global = false, ci = false, claude = true, agentsMd = true, force = false, log = console.log }) {
   const home = os.homedir();
   const done = [];
 
   if (claude) {
-    const dir = global ? path.join(home, '.claude', 'skills', 'sloplint') : path.join(cwd, '.claude', 'skills', 'sloplint');
-    write(path.join(dir, 'SKILL.md'), read('skills/sloplint/SKILL.md'), { force: true });
-    done.push(['Claude Code skill', path.join(dir, 'SKILL.md')]);
+    const base = global ? path.join(home, '.claude', 'skills') : path.join(cwd, '.claude', 'skills');
+    for (const [name, label] of SKILLS) {
+      const file = path.join(base, name, 'SKILL.md');
+      write(file, read(`skills/${name}/SKILL.md`), { force: true });
+      done.push([label, file]);
+    }
   }
 
   if (agentsMd) {

@@ -4,7 +4,7 @@ Thanks for helping. The most useful contributions are:
 
 1. **False-positive reports.** If sloplint flags code that is fine, [open an issue](https://github.com/Talha-2/sloplint/issues/new?template=false-positive.yml) with the snippet. Precision matters more than coverage.
 2. **New rules** for mistakes reviewers keep catching in AI-written code.
-3. **Better wording** in the agent skill (`skills/sloplint/SKILL.md`).
+3. **Better wording** in the agent skills (`skills/`).
 
 ## Setup
 
@@ -29,7 +29,8 @@ src/
   report.js              text, JSON and Markdown output, grades
   init.js                `sloplint init`
   data/                  Python standard library list, pip name mappings
-skills/sloplint/         the agent skill (Claude Code)
+skills/sloplint/         agent skill for writing work
+skills/sloplint-review/  agent skill for reviewing a change
 templates/               files `sloplint init` writes into other repos
 action.yml               the GitHub Action
 examples/demo/           a sloppy project used for the README output
@@ -53,7 +54,7 @@ A rule should flag only things a reviewer can verify. If a rule can't tell for s
 
 ## Changing the agent skill
 
-The skill (`skills/sloplint/SKILL.md`) and the AGENTS.md section (`templates/agents-md-section.md`) contain the same rules. Keep them in sync. Write in plain language: short sentences, one idea each, and a reason for every rule.
+The writing skill (`skills/sloplint/SKILL.md`), the review skill (`skills/sloplint-review/SKILL.md`) and the AGENTS.md section (`templates/agents-md-section.md`) use the same nine rules. Keep them in sync. Write in plain language: short sentences, one idea each, and a reason for every rule.
 
 ## Pull requests
 

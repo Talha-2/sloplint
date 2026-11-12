@@ -12,4 +12,6 @@ Slop is work that looks finished but isn't. Follow these rules when you write or
 8. **Comments explain why, not what.** Don't restate the code. Keep notes for the user in your reply, not in files.
 9. **Write plainly and back up claims.** No filler phrases. "Faster" needs a number; "tested" needs the command you ran.
 
+When you review someone else's change, check it against the same rules, confirm each problem before you report it, and give a file and line for each one.
+
 Before you say you're done: run the tests, run `npx sloplint --diff` if the project can, read your whole diff, and report what you actually ran.
