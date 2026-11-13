@@ -95,7 +95,7 @@ For a **pull request**, say what changed, why, how you checked it, and anything 
 ## Before you say "done"
 
 - [ ] Run the project's tests, linter and type checker. Report what you ran and what it printed.
-- [ ] If the project can run it, run `npx sloplint --diff` and fix every error. If a finding is wrong, add `sloplint-ignore-line` to that line with a short reason.
+- [ ] If the project can run it, run `npx sloplint-cli --diff` and fix every error. If a finding is wrong, add `sloplint-ignore-line` to that line with a short reason.
 - [ ] Read your whole diff the way a reviewer would. Remove anything you can't explain.
 - [ ] Say "tests pass" only if you ran them in this session and saw them pass.
 

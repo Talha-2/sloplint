@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/Talha-2/sloplint/actions/workflows/ci.yml"><img src="https://github.com/Talha-2/sloplint/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://www.npmjs.com/package/sloplint-cli"><img src="https://img.shields.io/npm/v/sloplint-cli" alt="npm version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="zero dependencies">
 </p>
@@ -22,7 +23,7 @@ sloplint finds the mistakes reviewers keep catching in AI-written code: packages
 It's not an AI detector. Every finding is a real problem, whoever wrote the code.
 
 ```
-$ npx sloplint --online
+$ npx sloplint-cli --online
 
 src/server.js
       2  error  "express-schema-guardian" does not exist on npm: likely hallucinated (slopsquatting risk)  phantom-import
@@ -42,20 +43,20 @@ This output comes from [`examples/demo`](examples/demo). Run it there to see it 
 **Check your code.** No install, no config.
 
 ```bash
-npx sloplint          # whole project
-npx sloplint --diff   # only what you changed
+npx sloplint-cli          # whole project
+npx sloplint-cli --diff   # only what you changed
 ```
 
 **Teach your coding agent.** Adds the rules for Claude Code, Codex, Cursor, Copilot and other agents, so they check their own work.
 
 ```bash
-npx sloplint init
+npx sloplint-cli init
 ```
 
 **Review every pull request.** Adds a GitHub Action that comments on each PR.
 
 ```bash
-npx sloplint init --ci
+npx sloplint-cli init --ci
 ```
 
 ## What it catches
@@ -75,7 +76,7 @@ Works on JavaScript, TypeScript and Python. The comment and prose rules also cov
 
 ## Agent skills
 
-`npx sloplint init` installs these for Claude Code. Each one is a short, plain-language process the agent follows.
+`npx sloplint-cli init` installs these for Claude Code. Each one is a short, plain-language process the agent follows.
 
 | Skill | Used when the agent… |
 |---|---|

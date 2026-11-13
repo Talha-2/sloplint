@@ -14,4 +14,4 @@ Slop is work that looks finished but isn't. Follow these rules when you write or
 
 When you review someone else's change, check it against the same rules, confirm each problem before you report it, and give a file and line for each one.
 
-Before you say you're done: run the tests, run `npx sloplint --diff` if the project can, read your whole diff, and report what you actually ran.
+Before you say you're done: run the tests, run `npx sloplint-cli --diff` if the project can, read your whole diff, and report what you actually ran.

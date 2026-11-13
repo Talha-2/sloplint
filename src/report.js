@@ -110,7 +110,7 @@ export function formatMarkdown(result, { linkBase } = {}) {
     const link = linkBase ? `[${escapeMd(where)}](${linkBase}/${encodePath(f.file)}#L${f.line})` : `\`${where}\``;
     lines.push(`| ${icon} | ${link} | ${escapeMd(f.message)} | [\`${f.rule}\`](${RULE_DOCS}#${f.rule}) |`);
   }
-  if (sorted.length > MAX_ROWS) lines.push('', `…and ${sorted.length - MAX_ROWS} more. Run \`npx sloplint --diff\` locally for the full list.`);
+  if (sorted.length > MAX_ROWS) lines.push('', `…and ${sorted.length - MAX_ROWS} more. Run \`npx sloplint-cli --diff\` locally for the full list.`);
   lines.push('');
   lines.push('<sub>Not an AI detector: these are checkable problems no matter who wrote the code. Silence a false positive with <code>// sloplint-ignore-line</code>.</sub>');
   return lines.join('\n');

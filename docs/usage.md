@@ -25,7 +25,7 @@ The exit code is `1` when findings reach `--fail-on`, and `2` on a usage error. 
 
 ## Agent rules
 
-`npx sloplint init` writes:
+`npx sloplint-cli init` writes:
 
 | File | Read by |
 |---|---|

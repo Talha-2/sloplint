@@ -60,8 +60,8 @@ export function runInit({ cwd, global = false, ci = false, claude = true, agents
   if (!global) {
     log('Next:');
     log('  • Commit these files so everyone on the repo (and their agents) gets them.');
-    if (!ci) log('  • Add PR reviews with:  npx sloplint init --ci');
-    log('  • Check your own changes any time:  npx sloplint --diff');
+    if (!ci) log('  • Add PR reviews with:  npx sloplint-cli init --ci');
+    log('  • Check your own changes any time:  npx sloplint-cli --diff');
   }
 }
 

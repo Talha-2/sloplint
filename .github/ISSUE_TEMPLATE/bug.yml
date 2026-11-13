@@ -18,7 +18,7 @@ body:
     id: command
     attributes:
       label: Command you ran
-      placeholder: npx sloplint --diff
+      placeholder: npx sloplint-cli --diff
   - type: input
     id: versions
     attributes:

@@ -24,7 +24,7 @@ Also read the pull request description or commit message, if there is one. You w
 If the project can run it, run:
 
 ```bash
-npx sloplint --diff --online
+npx sloplint-cli --diff --online
 ```
 
 Use `--base <branch>` if the change isn't based on the default branch.
@@ -87,7 +87,7 @@ Use this format:
 
 **What I checked**
 
-Ran `npx sloplint --diff --online` (2 findings, both confirmed), `npm test` (passed), and read all 6 changed files.
+Ran `npx sloplint-cli --diff --online` (2 findings, both confirmed), `npm test` (passed), and read all 6 changed files.
 ```
 
 Follow these rules when you write it:
