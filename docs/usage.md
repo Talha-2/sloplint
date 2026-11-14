@@ -29,13 +29,13 @@ The exit code is `1` when findings reach `--fail-on`, and `2` on a usage error. 
 
 | File | Read by |
 |---|---|
-| `.claude/skills/sloplint/SKILL.md` | Claude Code, when it writes or changes code |
-| `.claude/skills/sloplint-review/SKILL.md` | Claude Code, when you ask it to review a diff or pull request |
-| `.claude/skills/sloplint-tests/SKILL.md` | Claude Code, when it writes or fixes tests |
-| `.claude/skills/sloplint-deps/SKILL.md` | Claude Code, before it adds or upgrades a package |
+| `.claude/skills/<skill>/` | Claude Code |
+| `.agents/skills/<skill>/` | Codex |
 | a marked section in `AGENTS.md` (the rest of the file is untouched) | Codex, Cursor, GitHub Copilot, Gemini CLI, Jules, Amp |
 
-Running it again updates the section in place. Claude Code users can also install the skill as a plugin:
+The four skills are `sloplint` (writing code, tests and docs), `sloplint-review` (reviewing a change, including the agent's own work), `sloplint-tests` (writing tests that can fail) and `sloplint-deps` (checking a package before adding it).
+
+Running `init` again updates everything in place. The skill folders are replaced whole, so don't keep your own edits inside them. Use `--no-claude`, `--no-codex` or `--no-agents-md` to skip a target. Claude Code users can also install the skill as a plugin:
 
 ```
 /plugin marketplace add Talha-2/sloplint

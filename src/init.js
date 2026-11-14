@@ -10,27 +10,30 @@ const END = '<!-- sloplint:end -->';
 
 /**
  * Install sloplint's rules where coding agents will read them.
- *  - Claude Code: .claude/skills/<name>/SKILL.md for each skill (loaded on demand)
+ *  - Claude Code: .claude/skills/<name>/ for each skill (loaded on demand)
+ *  - Codex:       .agents/skills/<name>/ for each skill (project only)
  *  - AGENTS.md:   a short always-on section (Codex, Cursor, Copilot, Gemini CLI, Jules, Amp...)
  *  - --ci:        .github/workflows/sloplint.yml
  */
-const SKILLS = [
-  ['sloplint', 'Writing skill'],
-  ['sloplint-review', 'Review skill'],
-  ['sloplint-tests', 'Testing skill'],
-  ['sloplint-deps', 'Dependency skill'],
-];
+export const SKILLS = ['sloplint', 'sloplint-review', 'sloplint-tests', 'sloplint-deps'];
 
-export function runInit({ cwd, global = false, ci = false, claude = true, agentsMd = true, force = false, log = console.log }) {
+export function runInit({ cwd, global = false, ci = false, claude = true, codex = true, agentsMd = true, force = false, log = console.log }) {
   const home = os.homedir();
   const done = [];
 
   if (claude) {
     const base = global ? path.join(home, '.claude', 'skills') : path.join(cwd, '.claude', 'skills');
-    for (const [name, label] of SKILLS) {
-      const file = path.join(base, name, 'SKILL.md');
-      write(file, read(`skills/${name}/SKILL.md`), { force: true });
-      done.push([label, file]);
+    installSkills(base);
+    done.push(['Claude Code skills', base]);
+  }
+
+  if (codex) {
+    if (global) {
+      log('Codex skills are installed per project: run `npx sloplint-cli init` inside a repo.');
+    } else {
+      const base = path.join(cwd, '.agents', 'skills');
+      installSkills(base);
+      done.push(['Codex skills', base]);
     }
   }
 
@@ -55,13 +58,23 @@ export function runInit({ cwd, global = false, ci = false, claude = true, agents
     }
   }
 
-  for (const [what, file] of done) log(`  ✓ ${what.padEnd(18)} ${global ? file : rel(cwd, file)}`);
+  for (const [what, file] of done) log(`  ✓ ${what.padEnd(20)} ${global ? file : rel(cwd, file)}`);
   log('');
   if (!global) {
     log('Next:');
     log('  • Commit these files so everyone on the repo (and their agents) gets them.');
     if (!ci) log('  • Add PR reviews with:  npx sloplint-cli init --ci');
     log('  • Check your own changes any time:  npx sloplint-cli --diff');
+  }
+}
+
+// Each skill folder is managed by sloplint: replace it whole, so files removed
+// in a newer version don't linger and links between files stay valid.
+function installSkills(base) {
+  for (const name of SKILLS) {
+    const dest = path.join(base, name);
+    fs.rmSync(dest, { recursive: true, force: true });
+    fs.cpSync(new URL(`skills/${name}/`, PKG_ROOT), dest, { recursive: true });
   }
 }
 

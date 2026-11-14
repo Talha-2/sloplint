@@ -1,6 +1,6 @@
 {
   "name": "sloplint-cli",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Catch the checkable problems AI-written code ships with: hallucinated packages, placeholder code, tests that can't fail, swallowed errors. CLI, GitHub Action and agent skill.",
   "type": "module",
   "bin": {

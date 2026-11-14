@@ -1,0 +1,5 @@
+interface:
+  display_name: "sloplint Deps"
+  short_description: "Check a package is real before adding it"
+policy:
+  allow_implicit_invocation: true

@@ -29,10 +29,11 @@ src/
   report.js              text, JSON and Markdown output, grades
   init.js                `sloplint init`
   data/                  Python standard library list, pip name mappings
-skills/sloplint/         agent skill for writing work
-skills/sloplint-review/  agent skill for reviewing a change
-skills/sloplint-tests/   agent skill for writing tests that can fail
-skills/sloplint-deps/    agent skill for adding packages safely
+skills/<name>/           agent skills: SKILL.md, agents/openai.yaml, references/
+  sloplint/              writing code, tests and docs
+  sloplint-review/       reviewing a change
+  sloplint-tests/        writing tests that can fail
+  sloplint-deps/         adding packages safely
 templates/               files `sloplint init` writes into other repos
 action.yml               the GitHub Action
 examples/demo/           a sloppy project used for the README output
@@ -54,11 +55,13 @@ test/                    tests, using Node's built-in test runner
 
 A rule should flag only things a reviewer can verify. If a rule can't tell for sure, it should stay quiet or use a lower severity.
 
-## Changing the agent skill
+## Changing the agent skills
+
+Read [Writing skills](docs/writing-skills.md) first. It covers the layout, the description, and how to word each sentence.
 
 The writing skill (`skills/sloplint/SKILL.md`), the review skill (`skills/sloplint-review/SKILL.md`) and the AGENTS.md section (`templates/agents-md-section.md`) use the same nine rules. Keep them in sync. The tests and deps skills expand rules 6 and 1 into full processes, so keep them consistent with those rules too.
 
-New skills go in `skills/<name>/SKILL.md` and must be added to the `SKILLS` list in `src/init.js`. Write in plain language: short sentences, one idea each, and a reason for every rule.
+New skills go in `skills/<name>/` and must be added to the `SKILLS` list in `src/init.js`. `npm test` checks that every skill is listed, that its frontmatter is valid, and that its links resolve.
 
 ## Pull requests
 

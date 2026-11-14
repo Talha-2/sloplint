@@ -10,7 +10,7 @@ import { scan } from '../src/index.js';
 import { parseDiff } from '../src/git.js';
 import { summarize, formatMarkdown, COMMENT_MARKER } from '../src/report.js';
 import { globToRegExp } from '../src/config.js';
-import { runInit } from '../src/init.js';
+import { runInit, SKILLS } from '../src/init.js';
 
 const CLI = fileURLToPath(new URL('../bin/sloplint.js', import.meta.url));
 const git = (cwd, ...args) => execFileSync('git', ['-c', 'user.email=t@t', '-c', 'user.name=t', ...args], { cwd, stdio: 'pipe' });
@@ -91,19 +91,67 @@ test('globToRegExp', () => {
   assert.ok(!globToRegExp('src/*.ts').test('src/x/a.ts'));
 });
 
-test('init installs the skill and an idempotent AGENTS.md section', () => {
-  const cwd = fixture({ 'AGENTS.md': '# Project rules\n\nUse pnpm.\n' });
+test('init installs whole skill folders and an idempotent AGENTS.md section', () => {
+  const cwd = fixture({
+    'AGENTS.md': '# Project rules\n\nUse pnpm.\n',
+    '.claude/skills/sloplint/references/removed-in-new-version.md': 'stale',
+  });
   const quiet = () => {};
   runInit({ cwd, ci: true, log: quiet });
   runInit({ cwd, ci: true, log: quiet });
+
   const agents = fs.readFileSync(path.join(cwd, 'AGENTS.md'), 'utf8');
   assert.ok(agents.startsWith('# Project rules\n\nUse pnpm.'));
   assert.equal(agents.split('<!-- sloplint:start -->').length, 2);
-  assert.match(fs.readFileSync(path.join(cwd, '.claude/skills/sloplint/SKILL.md'), 'utf8'), /^---\nname: sloplint\n/);
-  for (const name of ['sloplint-review', 'sloplint-tests', 'sloplint-deps']) {
-    assert.match(fs.readFileSync(path.join(cwd, `.claude/skills/${name}/SKILL.md`), 'utf8'), new RegExp(`^---\\nname: ${name}\\n`));
+
+  for (const base of ['.claude/skills', '.agents/skills']) {
+    for (const name of SKILLS) {
+      const dir = path.join(cwd, base, name);
+      assert.match(fs.readFileSync(path.join(dir, 'SKILL.md'), 'utf8'), new RegExp(`^---\\nname: ${name}\\n`));
+      assert.ok(fs.existsSync(path.join(dir, 'agents/openai.yaml')), `${base}/${name} has agents/openai.yaml`);
+    }
   }
+  assert.ok(fs.existsSync(path.join(cwd, '.claude/skills/sloplint-deps/references/registries.md')));
+  assert.ok(!fs.existsSync(path.join(cwd, '.claude/skills/sloplint/references/removed-in-new-version.md')), 'stale files are removed');
   assert.match(fs.readFileSync(path.join(cwd, '.github/workflows/sloplint.yml'), 'utf8'), /fetch-depth: 0/);
+});
+
+test('init can skip the Codex skills', () => {
+  const cwd = fixture({});
+  runInit({ cwd, codex: false, log: () => {} });
+  assert.ok(fs.existsSync(path.join(cwd, '.claude/skills/sloplint/SKILL.md')));
+  assert.ok(!fs.existsSync(path.join(cwd, '.agents')));
+});
+
+test('every skill is well formed and its links resolve', () => {
+  const skillsDir = fileURLToPath(new URL('../skills/', import.meta.url));
+  const onDisk = fs.readdirSync(skillsDir).sort();
+  assert.deepEqual(onDisk, [...SKILLS].sort(), 'every skill folder is listed in SKILLS, and nothing else');
+
+  for (const name of SKILLS) {
+    const dir = path.join(skillsDir, name);
+    const skill = fs.readFileSync(path.join(dir, 'SKILL.md'), 'utf8');
+    const front = /^---\nname: ([^\n]+)\ndescription: ([^\n]+)\n---\n/.exec(skill);
+    assert.ok(front, `${name}: frontmatter has name and description`);
+    assert.equal(front[1], name, `${name}: name matches folder`);
+    assert.ok(front[2].length <= 1024, `${name}: description is at most 1024 characters`);
+    assert.match(front[2], /^Use (when|whenever|before)/, `${name}: description starts with when to use it`);
+
+    const yaml = fs.readFileSync(path.join(dir, 'agents/openai.yaml'), 'utf8');
+    assert.match(yaml, /display_name: "[^"]+"/);
+    assert.match(yaml, /short_description: "[^"]{1,64}"/);
+
+    // Every relative Markdown link in the skill points at a file that exists.
+    const mdFiles = fs.readdirSync(dir, { recursive: true }).filter((f) => f.endsWith('.md'));
+    for (const md of mdFiles) {
+      const text = fs.readFileSync(path.join(dir, md), 'utf8');
+      for (const [, target] of text.matchAll(/\]\(([^)#\s]+)(?:#[^)]*)?\)/g)) {
+        if (/^[a-z]+:/i.test(target)) continue;
+        const resolved = path.resolve(dir, path.dirname(md), target);
+        assert.ok(fs.existsSync(resolved), `${name}/${md}: link "${target}" resolves`);
+      }
+    }
+  }
 });
 
 test('CLI exit codes and formats', () => {

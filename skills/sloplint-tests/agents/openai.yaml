@@ -1,0 +1,5 @@
+interface:
+  display_name: "sloplint Tests"
+  short_description: "Write tests and prove each one can fail"
+policy:
+  allow_implicit_invocation: true

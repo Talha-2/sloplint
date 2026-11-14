@@ -76,21 +76,22 @@ Works on JavaScript, TypeScript and Python. The comment and prose rules also cov
 
 ## Agent skills
 
-`npx sloplint-cli init` installs these for Claude Code. Each one is a short, plain-language process the agent follows.
+`npx sloplint-cli init` installs these for Claude Code (`.claude/skills`) and Codex (`.agents/skills`). Each one is a short, plain-language process the agent follows, loaded when the situation comes up rather than only when you ask.
 
 | Skill | Used when the agent… |
 |---|---|
 | [`sloplint`](skills/sloplint/SKILL.md) | writes or changes code, docs or commits |
-| [`sloplint-review`](skills/sloplint-review/SKILL.md) | reviews a diff or pull request |
+| [`sloplint-review`](skills/sloplint-review/SKILL.md) | reviews a change, including its own work before a commit |
 | [`sloplint-tests`](skills/sloplint-tests/SKILL.md) | writes tests, and proves each one fails when the code is broken |
 | [`sloplint-deps`](skills/sloplint-deps/SKILL.md) | adds a package, after checking it's real, maintained and licensed |
 
-Other agents (Codex, Cursor, Copilot, Gemini CLI) get the core rules through `AGENTS.md`.
+Agents without skill support (Cursor, Copilot, Gemini CLI) get the core rules through a section in `AGENTS.md`.
 
 ## Docs
 
 - [Usage](docs/usage.md): CLI options, GitHub Action, configuration, pre-commit hook
 - [Rules](docs/rules.md): what each rule flags and how to fix it
+- [Writing skills](docs/writing-skills.md): how the agent skills are written, for contributors
 
 ## Contributing
 

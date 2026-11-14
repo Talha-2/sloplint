@@ -1,47 +1,50 @@
 ---
 name: sloplint-review
-description: Use when someone asks you to review a change for quality or for AI slop, such as a diff, a branch, a commit or a pull request. It gives a step-by-step process for checking the change against the sloplint rules, confirming each problem before reporting it, and writing a clear review with file and line for every finding.
+description: Use whenever you review, check or audit a change, such as a diff, a branch, a commit or a pull request, whether or not a review was requested. That includes checking your own work before you commit it or open a pull request, and checking work handed back by another agent or a teammate before you accept it. Checks the change against the nine sloplint rules, confirms each problem before reporting it, and writes a short review with a file and line for every finding. To avoid the problems while writing code, use sloplint instead.
 ---
 
 # sloplint review
 
-Use this skill to review a change someone else made, or a change you made earlier.
+**Goal:** give the author a short list of real problems in their change, each one proved, so they can fix it without re-checking your work.
 
-A good review finds real problems and proves them. A review that guesses is slop too: it sends the author chasing problems that aren't there. So this process has one rule above the others: **confirm every problem before you report it.**
+**Principle: confirm before you report.** A review that guesses is slop too. It sends the author chasing problems that aren't there, and it teaches them to ignore your reviews.
 
-## Step 1. Get the change
+A review is not a rewrite. Report problems and suggest fixes; change the code only if the user asks.
 
-Find exactly what changed. Review only that.
+## 1. Get the change
 
-- A branch: `git diff main...HEAD` (use the project's main branch name)
-- A pull request: `gh pr diff <number>`
-- Uncommitted work: `git diff` and `git diff --staged`
+Review exactly what changed, and nothing else.
 
-Also read the pull request description or commit message, if there is one. You will check its claims in step 4.
+| What you were given | How to get the diff |
+|---|---|
+| A branch | `git diff <base>...HEAD`, where `<base>` is the branch it will merge into |
+| A pull request | `gh pr diff <number>` |
+| A commit | `git show <commit>` |
+| Uncommitted work | `git diff` and `git diff --staged` |
 
-## Step 2. Run sloplint
+If it isn't clear which change to review, ask once before you start. Also read the pull request description or commit message if there is one; step 4 checks its claims.
 
-If the project can run it, run:
+## 2. Run sloplint
+
+If the project can run it:
 
 ```bash
-npx sloplint-cli --diff --online
+npx sloplint-cli --diff --base <base> --online
 ```
 
-Use `--base <branch>` if the change isn't based on the default branch.
+Treat each sloplint finding as a **lead**, not a verdict. Confirm it in step 4 like anything else you notice. If the command can't run, note that for the report and continue by reading.
 
-Treat each finding as a lead, not a verdict. Confirm it in step 4 like any other problem.
+## 3. Read the change against the rules
 
-## Step 3. Read the change against the rules
-
-Read every changed line. For each part of the change, ask these questions. They match the nine rules of the `sloplint` skill.
+Read every changed line. Ask these questions; they match the nine rules of the sloplint skill.
 
 **Code**
 
 1. Is every new import a real package, declared in the dependency file?
-2. Does every function, method, flag and setting it uses actually exist?
+2. Does every function, option and endpoint it uses actually exist?
 3. Is any code left unfinished, such as `// ... rest of code` or a stub that does nothing?
-4. Is any error caught and then ignored without a reason?
-5. Does every change belong to the task? Are there unrelated edits or layers nothing needs yet?
+4. Is any error caught and then dropped without a reason?
+5. Does every change belong to the task?
 
 **Tests**
 
@@ -50,50 +53,56 @@ Read every changed line. For each part of the change, ask these questions. They 
 
 **Comments and writing**
 
-8. Do comments explain why, or do they only repeat the code? Are there notes to the user left in files?
-9. Are claims in docs, commit messages and the pull request description true and backed up?
+8. Do comments explain why, or only repeat the code? Are there notes to the user left in files?
+9. Are the claims in docs, the commit message and the pull request description true and backed up?
 
-## Step 4. Confirm each problem
+These questions are where to look, not a form to fill in. Skip the ones that don't apply to this change. Unchanged code is out of scope unless the change breaks it.
 
-Before you write a problem down, prove it. Each kind of problem has a check:
+## 4. Confirm each problem
 
-| Problem | How to confirm it |
-|---|---|
-| A package may not exist | Look it up: `npm view <name>` or `pip index versions <name>` |
-| A function or option may not exist | Search the codebase and the library's docs for its definition |
-| A test may not be able to fail | Read what it asserts. If you can, break the code briefly and run the test |
-| A claim may be false ("tests pass", "2x faster") | Run the command, or find the evidence in the change |
+Before you write a problem down, prove it. Read [Confirming problems](references/confirming-problems.md) for how to prove each kind.
 
-If you can't confirm a problem, either leave it out or list it as a question, not a finding.
+Then give it one of two states:
 
-Don't report matters of taste, such as naming or formatting the project's linter already accepts. They bury the real problems.
+- **Confirmed:** you checked, and the evidence shows the problem. Say what you checked.
+- **Question:** it looks wrong, but you couldn't prove it, or it depends on intent you can't see.
 
-## Step 5. Write the review
+Never present a Question as a Confirmed problem. If you can't confirm something and it isn't worth asking, leave it out.
 
-Use this format:
+Keep the effort bounded. Spend a few minutes confirming each lead, not the whole session. If one can't be settled quickly, make it a Question.
+
+Leave out matters of taste, such as naming or formatting the project's own linter already accepts. They bury the real problems.
+
+## 5. Write the review
+
+Use this shape. Drop sections that don't apply.
 
 ```markdown
-**Verdict:** Ready to merge / Needs changes / Needs discussion
+**Verdict:** Ready to merge | Needs changes | Needs discussion
 
 **Problems**
 
 1. `src/api.ts:42`: Imports `express-schema-guardian`, which doesn't exist on npm.
-   Why it matters: the build fails, and someone could publish a package under that name.
+   Why it matters: the install fails, and anyone could publish a package under that name.
    Fix: use `zod`, which the project already depends on.
 
 **Questions**
 
-- `src/cache.ts:88`: Is the 5-minute timeout intended? It isn't mentioned in the description.
+- `src/cache.ts:88`: Is the 5-minute timeout intended? The description doesn't mention it.
 
 **What I checked**
 
-Ran `npx sloplint-cli --diff --online` (2 findings, both confirmed), `npm test` (passed), and read all 6 changed files.
+Ran `npx sloplint-cli --diff --online` (2 findings, both confirmed) and `npm test` (48 passed).
+Read all 6 changed files. Did not run the end-to-end tests: they need a database.
 ```
 
-Follow these rules when you write it:
-
 - Put the most serious problem first.
-- Give every problem a file and line, what is wrong, why it matters, and a concrete fix.
-- Keep each problem to two or three short sentences.
-- Always include "What I checked", so the reader knows how far to trust the review.
-- If you found no problems, say so plainly. Don't invent problems to look thorough.
+- Give every problem a file and line, what is wrong, why it matters and a concrete fix, in two or three short sentences.
+- Always include **What I checked**, including what you didn't check. It tells the reader how far to trust the review.
+- If you found no problems, say so plainly and still list what you checked. Don't invent problems to look thorough.
+
+## When something fails
+
+- **Can't get the diff** (no access to the pull request, unknown branch): tell the user what you tried and ask for the change another way.
+- **sloplint or the tests can't run:** review by reading, and say in What I checked which tools didn't run and why.
+- **The registry can't be reached:** keep package findings as Questions, not Confirmed problems.

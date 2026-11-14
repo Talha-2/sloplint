@@ -34,7 +34,8 @@ Options
 Init options
   --global               install for every project (~/.claude/skills, ~/.codex/AGENTS.md)
   --ci                   add .github/workflows/sloplint.yml
-  --no-claude            skip the Claude Code skill
+  --no-claude            skip the Claude Code skills (.claude/skills)
+  --no-codex             skip the Codex skills (.agents/skills)
   --no-agents-md         skip the AGENTS.md section (Codex, Cursor, Copilot, Gemini CLI...)
 
 Docs: https://github.com/Talha-2/sloplint`;
@@ -61,6 +62,7 @@ async function main(argv) {
       global: { type: 'boolean' },
       ci: { type: 'boolean' },
       'no-claude': { type: 'boolean' },
+      'no-codex': { type: 'boolean' },
       'no-agents-md': { type: 'boolean' },
       force: { type: 'boolean' },
       'from-json': { type: 'string' },
@@ -79,6 +81,7 @@ async function main(argv) {
       global: values.global,
       ci: values.ci,
       claude: !values['no-claude'],
+      codex: !values['no-codex'],
       agentsMd: !values['no-agents-md'],
       force: values.force,
       log: print,

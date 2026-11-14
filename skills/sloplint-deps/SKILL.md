@@ -1,82 +1,74 @@
 ---
 name: sloplint-deps
-description: Use before you add, suggest or upgrade a package or library (npm, pip, or any package manager), and when you review a change that adds one. It gives a step-by-step check that the package is needed, real, correctly named, maintained and allowed, and then shows how to add it the way the project expects.
+description: Use before you add, install, suggest or upgrade a package or library with any package manager (npm, pnpm, yarn, bun, pip, uv, poetry), and when you review a change that adds one. Checks that the package is needed, correctly named, real, maintained and licensed, then adds it the way the project expects. For calls to functions inside a package that's already installed, use sloplint rule 2 instead.
 ---
 
 # sloplint deps
 
-Adding a package means trusting someone else's code to run inside the project. AI models often suggest packages that don't exist, or get a real package's name slightly wrong. Attackers know this. They publish packages under those invented or misspelled names, so the wrong install can run their code. This attack is called slopsquatting.
+**Goal:** add a package only when it's needed, and only after checking that it is the one you meant.
 
-Go through these steps before you add any package. Each step can stop the process. If one does, tell the user why.
+**Principle: a package that installs is not proof it's the right one.** Models often suggest packages that don't exist, or get a real name slightly wrong. Attackers publish packages under those invented and misspelled names, so the wrong install runs their code. This is called **slopsquatting**.
 
-## Step 1. Check whether you need a new package
+Go through the steps in order. Any step can stop the process; when one does, tell the user why instead of looking for a workaround. Read [Registries and package managers](references/registries.md) for the commands each step uses.
 
-- **Do:** Look for something that already does the job: the language's standard library, a package the project already depends on, or a few lines of your own code.
-- **Why:** Every new package adds code to trust, update and audit.
-- **Check:** Search the dependency file (`package.json`, `requirements.txt`, `pyproject.toml`) and the codebase before you look anywhere else.
+## 1. Check whether you need a new package
 
-## Step 2. Get the exact name from an official source
+Look first for something that already does the job: the language's standard library, a package the project already depends on, or a few lines of your own code. Every new package is more code to trust, update and audit.
 
-- **Do:** Copy the package name from the library's official documentation or its source repository. Don't type it from memory.
-- **Why:** A name that is one letter off, or that merely sounds right, can belong to a different package or to an attacker.
-- **Check:** Compare the name letter by letter with the official source. Be suspicious of names that look like a popular package with a small change, such as an extra word or a swapped letter.
+## 2. Get the exact name from an official source
 
-## Step 3. Confirm the package exists and is the right one
+Copy the name from the library's official documentation or its source repository. Don't type it from memory. A name that is one letter off, or that merely sounds right, can belong to someone else. Be wary of names that look like a popular package with a small change, such as an extra word or a swapped letter.
 
-- **Do:** Look the package up in its registry.
-  - npm: `npm view <name> name version description repository.url`
-  - PyPI: open `https://pypi.org/project/<name>/`, or run `pip index versions <name>` (an experimental pip command, so prefer the page if it fails)
-- **Why:** A package that doesn't exist will break the install. A package with the right name but the wrong owner can be malicious.
-- **Check:** The description and source repository should match the library you meant. If the package doesn't exist, stop. Don't look for a similar name to replace it.
+## 3. Confirm it exists and is the right package
 
-## Step 4. Check that it is maintained and used
+Look the package up in its registry. Check that its description and source repository match the library you meant. A package with the right name and the wrong owner is the attack this skill exists to stop.
 
-- **Do:** Look at when it last released and how widely it is used.
-  - npm: `npm view <name> time.modified` for the last release, and `https://api.npmjs.org/downloads/point/last-week/<name>` for weekly downloads
-  - PyPI: the release history on its PyPI page
-- **Why:** An abandoned package won't get security fixes. A brand-new package with almost no users hasn't been checked by anyone.
-- **Check:** Tell the user if the package hasn't released in over two years, has very few downloads, was first published only recently, or has open security advisories. Let them decide.
+## 4. Check that it is maintained and used
 
-## Step 5. Check the license
+Look at when it last released and how widely it's used. An abandoned package won't get security fixes; a new package with almost no users hasn't been looked at by anyone.
 
-- **Do:** Find the license: `npm view <name> license`, or the license shown on the PyPI page.
-- **Why:** Some licenses limit how the project can be used or sold.
-- **Check:** If the license is missing, unusual, or different from the licenses the project already uses, tell the user before you add the package.
+## 5. Check the license
 
-## Step 6. Add it the way the project does
+Find its license. Some licenses limit how the project can be used or sold.
 
-- **Do:** Use the project's own package manager, so the lock file updates too. The lock file in the project tells you which one:
+## When to stop
 
-  | Lock file | Command |
-  |---|---|
-  | `package-lock.json` | `npm install <name>` |
-  | `pnpm-lock.yaml` | `pnpm add <name>` |
-  | `yarn.lock` | `yarn add <name>` |
-  | `bun.lock` or `bun.lockb` | `bun add <name>` |
-  | `uv.lock` | `uv add <name>` |
-  | `poetry.lock` | `poetry add <name>` |
-  | `requirements.txt` only | Add the package to `requirements.txt`, then run `pip install -r requirements.txt` |
+| What you found | What to do |
+|---|---|
+| The package doesn't exist | Stop. Don't substitute a similar name. Tell the user. |
+| The name or repository doesn't match the official source | Stop and tell the user what doesn't match. |
+| No release in over two years, very few downloads, first published recently, or open security advisories | Tell the user what you found and let them decide before you add it. |
+| The license is missing, unusual, or different from the project's other dependencies | Tell the user before you add it. |
+| Something the project already has does the job | Use that instead, and say so. |
 
-- **Why:** Mixing package managers creates conflicting lock files and installs that differ between machines.
-- **Check:** Put packages that are only needed for development or tests in the development section (`npm install -D`, `uv add --dev`, `poetry add --group dev`). Follow the project's existing style for version ranges.
+## 6. Add it the way the project does
 
-## Step 7. Report what you added
+Use the project's own package manager, so the lock file updates too. The lock file tells you which one. Put packages needed only for development or tests in the development dependencies, and follow the project's existing style for version ranges.
 
-Tell the user:
+After installing, check that the dependency file and the lock file both changed, and that the project still builds and its tests pass.
 
-- the package name and version you added, and why it was needed
-- what you checked: the official source of the name, last release, usage, and license
-- anything that looked risky, even if you added the package anyway
+## 7. Report what you added
 
-Example (figures as of November 2026):
+Tell the user what you added, why, and what you checked, including anything that looked risky even if you added the package anyway.
 
 ```text
 Added zod 4.6.7 to dependencies (npm install zod) to validate request bodies.
 Name copied from zod.dev; the npm entry links to github.com/colinhacks/zod.
 Last release one month ago, about 450 million downloads a week, MIT license.
-The project had no validation library, so nothing existing could do this.
+The project had no validation library, so nothing existing did this.
 ```
+
+The figures above are from November 2026.
+
+## Upgrading a package
+
+Treat an upgrade to a new major version like adding a new package: read its changelog or release notes for breaking changes between the two versions. Then upgrade with the project's package manager, run the tests, and report anything that changed behaviour. A clean install is not proof that nothing broke.
+
+## When something fails
+
+- **The registry can't be reached:** don't add the package as checked. Tell the user it is unverified and which checks you couldn't run.
+- **The install fails:** read the error. Don't switch to a different package or package manager to make it pass without telling the user.
 
 ## When you review a change that adds a package
 
-Run steps 2 to 5 on every new or changed package in the dependency file. If the change added a package without touching the dependency file, or without updating the lock file, report it.
+Run steps 2 to 5 on every new or upgraded package in the dependency file. Report it if the change imports a package without declaring it, or changes the dependency file without updating the lock file.

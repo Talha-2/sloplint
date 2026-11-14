@@ -1,0 +1,5 @@
+interface:
+  display_name: "sloplint Review"
+  short_description: "Review a change and confirm each problem"
+policy:
+  allow_implicit_invocation: true

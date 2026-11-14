@@ -1,0 +1,5 @@
+interface:
+  display_name: "sloplint"
+  short_description: "Avoid AI slop while writing code, tests and docs"
+policy:
+  allow_implicit_invocation: true
