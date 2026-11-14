@@ -9,7 +9,9 @@ description: Use before you add, install, suggest or upgrade a package or librar
 
 **Principle: a package that installs is not proof it's the right one.** Models often suggest packages that don't exist, or get a real name slightly wrong. Attackers publish packages under those invented and misspelled names, so the wrong install runs their code. This is called **slopsquatting**.
 
-Go through the steps in order. Any step can stop the process; when one does, tell the user why instead of looking for a workaround. Read [Registries and package managers](references/registries.md) for the commands each step uses.
+Go through the steps in order. Any step can stop the process. When one does, tell the user why instead of looking for a workaround. Read [Registries and package managers](references/registries.md) for the commands each step uses.
+
+If you are only suggesting a package, not installing it, do steps 1 to 5 and tell the user what you checked.
 
 ## 1. Check whether you need a new package
 
@@ -25,7 +27,7 @@ Look the package up in its registry. Check that its description and source repos
 
 ## 4. Check that it is maintained and used
 
-Look at when it last released and how widely it's used. An abandoned package won't get security fixes; a new package with almost no users hasn't been looked at by anyone.
+Look at when it was last released and how widely it's used. An abandoned package won't get security fixes. A new package with almost no users has had few people check it.
 
 ## 5. Check the license
 
@@ -37,7 +39,7 @@ Find its license. Some licenses limit how the project can be used or sold.
 |---|---|
 | The package doesn't exist | Stop. Don't substitute a similar name. Tell the user. |
 | The name or repository doesn't match the official source | Stop and tell the user what doesn't match. |
-| No release in over two years, very few downloads, first published recently, or open security advisories | Tell the user what you found and let them decide before you add it. |
+| No release in over two years, few downloads (for example, under about 1,000 a week on npm), first published in the last few weeks, or open security advisories | Tell the user what you found and let them decide before you add it. |
 | The license is missing, unusual, or different from the project's other dependencies | Tell the user before you add it. |
 | Something the project already has does the job | Use that instead, and say so. |
 
@@ -62,7 +64,9 @@ The figures above are from November 2026.
 
 ## Upgrading a package
 
-Treat an upgrade to a new major version like adding a new package: read its changelog or release notes for breaking changes between the two versions. Then upgrade with the project's package manager, run the tests, and report anything that changed behaviour. A clean install is not proof that nothing broke.
+For an upgrade to a new major version, read the changelog or release notes for breaking changes between the two versions before you upgrade. Minor and patch upgrades don't need this.
+
+For any upgrade, use the project's package manager, run the tests, and report anything that changed behaviour. A clean install is not proof that nothing broke.
 
 ## When something fails
 

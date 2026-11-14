@@ -5,11 +5,14 @@ description: Use whenever you review, check or audit a change, such as a diff, a
 
 # sloplint review
 
-**Goal:** give the author a short list of real problems in their change, each one proved, so they can fix it without re-checking your work.
+**Goal:** give the author a short list of problems you have confirmed, plus any open questions, so they can act without re-checking your work.
 
 **Principle: confirm before you report.** A review that guesses is slop too. It sends the author chasing problems that aren't there, and it teaches them to ignore your reviews.
 
-A review is not a rewrite. Report problems and suggest fixes; change the code only if the user asks.
+What you do with the problems depends on whose change it is:
+
+- **Someone else's change:** report the problems and suggest fixes. Change their code only if the user asks you to.
+- **Your own change:** fix the problems you confirm, then review the fixes the same way before you commit or report the task as done.
 
 ## 1. Get the change
 
@@ -22,11 +25,11 @@ Review exactly what changed, and nothing else.
 | A commit | `git show <commit>` |
 | Uncommitted work | `git diff` and `git diff --staged` |
 
-If it isn't clear which change to review, ask once before you start. Also read the pull request description or commit message if there is one; step 4 checks its claims.
+If it isn't clear which change to review, ask once before you start. Also read the pull request description or commit message if there is one. Step 4 checks its claims.
 
 ## 2. Run sloplint
 
-If the project can run it:
+If Node.js is available, run:
 
 ```bash
 npx sloplint-cli --diff --base <base> --online
@@ -36,7 +39,7 @@ Treat each sloplint finding as a **lead**, not a verdict. Confirm it in step 4 l
 
 ## 3. Read the change against the rules
 
-Read every changed line. Ask these questions; they match the nine rules of the sloplint skill.
+Read every changed line, and ask these questions. They match the nine rules of the sloplint skill.
 
 **Code**
 
@@ -69,9 +72,9 @@ Then give it one of two states:
 
 Never present a Question as a Confirmed problem. If you can't confirm something and it isn't worth asking, leave it out.
 
-Keep the effort bounded. Spend a few minutes confirming each lead, not the whole session. If one can't be settled quickly, make it a Question.
+Keep the effort bounded. If one or two checks don't settle a lead, make it a Question and move on.
 
-Leave out matters of taste, such as naming or formatting the project's own linter already accepts. They bury the real problems.
+Leave out matters of taste, such as naming, or formatting that the project's own linter accepts. They bury the real problems.
 
 ## 5. Write the review
 

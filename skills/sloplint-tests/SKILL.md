@@ -7,13 +7,13 @@ description: Use whenever you write, add, change or fix tests, whether or not th
 
 **Goal:** add tests that fail when the code is wrong, and prove they do.
 
-**Principle: a test that can't fail is not a test.** It is worse than no test, because it makes broken code look checked. A test passing is not proof that it can fail; step 5 is how you prove it.
+**Principle: a test that can't fail is not a test.** Such a test is worse than none, because it makes broken code look checked. A test passing is not proof that it can fail. Step 5 is how you prove it.
 
 Write tests for behaviour that matters. Don't add tests just to raise a count, and don't test the language or the framework itself.
 
 ## 1. Decide what to test
 
-List the behaviours the code must have, from the task and from how the code is used. For example: "returns the total in cents", "rejects an empty cart", "retries once on a timeout". Tests written from the expected behaviour catch mistakes; tests written by reading the implementation tend to repeat them.
+Work out the behaviours the code must have, from the task and from how the code is used. For example: "returns the total in cents", "rejects an empty cart", "retries once on a timeout". Tests written from the expected behaviour catch mistakes. Tests written by reading the implementation tend to repeat them.
 
 Cover the cases that break code most often, where they apply: empty input, a single item, the largest and smallest allowed values, invalid input and the error path.
 
@@ -23,7 +23,7 @@ Find existing tests for nearby code. Use the same framework, file location, nami
 
 ## 3. Write one behaviour per test
 
-Name each test after the behaviour it expects, such as `rejects an empty cart`, so a failure says what broke. Set up the input, run the code once, then assert on the result.
+Name each test after the behaviour it expects, such as `rejects an empty cart`, so a failure says what broke. Set up the input, call the code, then assert on the result.
 
 - Assert on what the code returns or does, not on how it does it internally.
 - Mock only what the code depends on, such as the network, the clock or the file system. Never mock the code under test.
@@ -32,7 +32,7 @@ Name each test after the behaviour it expects, such as `rejects an empty cart`, 
 
 ## 4. Run the tests
 
-Run the new tests, then the whole suite. A test you haven't run is a guess.
+Run the new tests first. Then run the rest of the suite, or, if the full suite is slow, the part that covers the code you changed. A test you haven't run is a guess.
 
 If a test fails, find out whether the code or the test is wrong. Don't change a test just to make it pass. If the code is wrong and fixing it is outside the task, tell the user instead of hiding the failure.
 
@@ -48,9 +48,10 @@ Ways to break the code:
 
 Work safely:
 
-- Change the code only in the working tree. Never commit or push the change.
-- Undo it straight away, then run `git diff` and confirm the code is exactly as it was.
-- Run the suite again and see it pass.
+- Before you break anything, run `git diff` and keep its output. Your own new code may already be in it.
+- Change only your local copy of the code. Never commit or push the broken version.
+- Reverse the exact edit straight away. Run `git diff` again and check that the output is the same as before the break.
+- Run the tests again and see them pass.
 
 When several tests check the same behaviour, one break can cover them, if each of those tests fails.
 
@@ -81,4 +82,4 @@ If you couldn't prove a test can fail, for example because the code can't be cha
 
 - **The tests can't run here** (missing database, credentials or tools): write the tests, say they weren't run and why, and don't report results you didn't see.
 - **Existing tests were already failing** before your change: say which ones, and don't count them as your failures or fix them silently.
-- **The undo didn't restore the code:** stop and tell the user before doing anything else.
+- **`git diff` differs after the undo:** the code wasn't fully restored. Stop and tell the user before doing anything else.
